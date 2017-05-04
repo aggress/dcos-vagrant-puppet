@@ -1,0 +1,13 @@
+---
+bootstrap_url: http://192.168.33.10:80
+cluster_name: 'dcos-vagrant-puppet'
+exhibitor_storage_backend: static
+ip_detect_filename: /genconf/ip-detect
+master_discovery: static
+master_list:
+  - 192.168.33.11
+agent_list:
+  - 192.168.33.12
+resolvers:
+  - 8.8.4.4
+  - 8.8.8.8

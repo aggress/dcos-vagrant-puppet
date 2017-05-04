@@ -30,7 +30,6 @@ class base {
 
   file { '/etc/systemd/system/docker.service.d/override.conf':
     content  => "[Service]\nExecStart=\nExecStart=/usr/bin/dockerd --storage-driver=overlay"
-    #require  => File['/etc/systemd/system/docker.service.d'],
   }
 
   exec { 'selinux permissive':
@@ -47,15 +46,46 @@ class base {
     enable   => 'true',
     require  => Package['docker-engine-1.13.1'],
   }
-
 }
 
 class bootstrap {
-  
 
+  Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
+
+  $str = @(EOT)
+    #!/usr/bin/env bash
+    set -o nounset -o errexit
+    export PATH=/usr/sbin:/usr/bin:$PATH
+    echo $(ip addr show eth1 | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
+    | EOT
+
+  file { '/root/genconf':
+    ensure   => 'directory',
+  }
+
+  file { '/root/genconf/ip-detect':
+    ensure   => file,
+    content  => $str,
+  }
+
+  file { '/root/dcos_generate_config.sh':
+    ensure   => 'link',
+    target   => '/vagrant/dcos_generate_config.sh',
+  }
+
+  file { '/root/genconf/config.yaml':
+    ensure   => file,
+    content  => file('/vagrant/config.yaml'),
+  }
+
+  exec { 'dcos_generate_config':
+    command  => 'bash dcos_generate_config.sh',
+    cwd      => '/root'
+  }
 
 }
 
 node boot {
   include base
+  include bootstrap
 }
