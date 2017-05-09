@@ -1,5 +1,6 @@
+# Base class for all nodes
 class base {
- 
+
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
   yumrepo { 'docker':
@@ -38,17 +39,18 @@ class base {
 
   service { 'ntpd':
     ensure   => 'running',
-    enable   => 'true',
+    enable   =>  true,
   }
 
   service { 'docker':
     ensure   => 'running',
-    enable   => 'true',
+    enable   => true,
     require  => Package['docker-engine-1.13.1'],
   }
 }
 
-class bootstrap {
+# Bootstrap node class for hosting installer
+class bootstrap_install {
 
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
@@ -80,12 +82,58 @@ class bootstrap {
 
   exec { 'dcos_generate_config':
     command  => 'bash dcos_generate_config.sh',
-    cwd      => '/root'
+    cwd      => '/root',
+  }
+
+  exec { 'launch bootstrap nginx container':
+    command  => 'docker run -d -p 80:80 -v /root/genconf/serve:/usr/share/nginx/html:ro nginx',
+  }
+}
+
+# Master node class
+class master_install {
+
+  Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
+
+  exec { 'curl the installer file from the boostrap node':
+    command  => 'curl -o http://192.68.33.10:80/dcos_install.sh',
+    cwd      => '/root',
+  }
+
+  exec { 'run the installer for master node':
+    command  => 'bash /root/dcos_install.sh master',
+    cwd      => '/root',
+  }
+}
+
+# Public agent node class
+class private_agent_install {
+
+  Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
+
+  exec { 'curl the installer file from the boostrap node':
+    command  => 'curl -o http://192.68.33.10:80/dcos_install.sh',
+    cwd      => '/root',
+  }
+
+  exec { 'run the installer for public agent node':
+    command  => 'bash /root/dcos_install.sh slave',
+    cwd      => '/root',
   }
 
 }
 
-node boot {
+node 'bootstrap' {
   include base
-  include bootstrap
+  include bootstrap_install
+}
+
+node 'master' {
+  include base
+  include master_install
+}
+
+node 'private-agent' {
+  include base
+  include private_agent_install
 }
