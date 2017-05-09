@@ -1,0 +1,8 @@
+dcos_generate_config.ee.sh
+dcos_generate_config.sh
+.DS_Store
+.DS_Store?
+*.tmp
+*.log
+*.retry
+/.vagrant
