@@ -29,15 +29,17 @@ Using Puppet for the Vagrant provisioner requires the guest VM having Puppet on 
 That's easily achieved by firing up a vanilla centos/7 box, installing the Puppet repo & puppet-agent.
 Do a full system update, then package the box and add to Vagrant to use.  I prefer to remove the existing centos/7 box and replace it with the newly packaged one as then I just default to it each time.
 
-1. SSH into the box and su -
-2. `rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm`
-3. `yum -y update`
-4. `yum -y install puppet-agent`
-5. Exit from the box back to your host
-6. `vagrant package --output centos7_updated.box`
-7. `vagrant box remove centos/7`
-8. `vagrant box add -f centos/7 centos7_updated.box`
-9. `vagrant box list` to see the replacement centos/7 box
+1. Build yourself a fresh new box `mkdir ~/vagrant/centos7_puppet && cd ~/vagrant/centos7_puppet`
+2. Initialise it and fire it up `vagrant init centos/7` && vagrant up`
+3. SSH into the box and su - `vagrant ssh` `sudo su -`
+4. `rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm`
+5. `yum -y update`
+6. `yum -y install puppet-agent`
+7. Exit from the box back to your host
+8. `vagrant package --output centos7_updated.box`
+9. `vagrant box remove centos/7`
+10. `vagrant box add -f centos/7 centos7_updated.box`
+11. `vagrant box list` to see the replacement centos/7 box
 
 The other advantage of this, is that you've saved a box with the latest yum updates and vbguest additions
 which will reduce the startup time going forwards.
