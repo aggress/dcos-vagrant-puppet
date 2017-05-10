@@ -48,6 +48,10 @@ class base {
   }
 
   # dc/os does not like being out of time
+  exec { 'ntpdate':
+    command  => 'ntpdate 0.pool.ntp.org',
+  }
+
   exec { 'enable systemd-timesyncd':
     command  => 'timedatectl set-ntp true',
   } ->

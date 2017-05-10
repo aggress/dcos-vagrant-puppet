@@ -23,10 +23,7 @@ boxes = [
 ]
 
 Vagrant.configure(2) do |config|
-
   config.vm.box = "centos/7"
-  #config.vm.synced_folder ".", "/vagrant"
-
   boxes.each do |opts|
     config.vm.define opts[:name] do |config|
       config.vm.hostname = opts[:name]
@@ -40,9 +37,10 @@ Vagrant.configure(2) do |config|
         # suggested speedup by enabing multiple cpu cores, figured it would be by default
         v.customize ["modifyvm", :id, "--ioapic", "on"]
       end
-      config.vm.provision "ansible" do |ansible|
-        ansible.playbook = "playbook.yml"
-      end
     end
+  end
+  config.vm.provision "puppet" do |puppet|
+    puppet.environment = "production"
+    puppet.environment_path  = "environments"
   end
 end

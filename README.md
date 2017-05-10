@@ -12,31 +12,49 @@ A simple, monotithic DC/OS puppet installer that demos the DC/OS advanced instal
 
 ## Pre-requisites
 
-* Install the latest version of:
+1. Install the latest version of:
   * Vagrant + vagrant-hostsupdater & vagrant-vbguest plugins
   * VirtualBox
   * Puppet to allow the Vagrant provisioner to bootstrap the node configuration
   * Facter for Puppet to use
-* Clone this repository locally into a folder where you'll execute it from, I tend to use ~/code/$project
-  `git clone git@gitub.com:aggress/dcos-vagrant-puppet ~/code/`
-* Symlink the Vagrantfile you want to use `ln -s Vagrantfile-cluster Vagrantfile`
-* Download the ~800MB DC/OS installation file to the project directory as you only want to get it once
-  `curl -fsSLO https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh`
+2. Clone this repository locally into a folder where you'll execute it from, I tend to use ~/code/$project
+  *`git clone git@gitub.com:aggress/dcos-vagrant-puppet ~/code/`
+3. Symlink the Vagrantfile you want to use `ln -s Vagrantfile-cluster Vagrantfile`
+4. Download the ~800MB DC/OS installation file to the project directory as you only want to get it once
+  * `curl -fsSLO https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh`
+
+## Vagrant box
+
+Using Puppet for the Vagrant provisioner requires the guest VM having Puppet on there, chicken/egg etc.
+That's easily achieved by firing up a vanilla centos/7 box, installing the Puppet repo & puppet-agent.
+Do a full system update, then package the box and add to Vagrant to use.  I prefer to remove the existing centos/7 box and replace it with the newly packaged one as then I just default to it each time.
+
+1. SSH into the box and su -
+2. `rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm`
+3. `yum -y update`
+4. `yum -y install puppet-agent`
+5. Exit from the box back to your host
+6. `vagrant package --output centos7_updated.box`
+7. `vagrant box remove centos/7`
+8. `vagrant box add -f centos/7 centos7_updated.box`
+9. `vagrant box list` to see the replacement centos/7 box
+
+The other advantage of this, is that you've saved a box with the latest yum updates and vbguest additions
+which will reduce the startup time going forwards.
 
 ## Usage
 
-* `cd ~/code/docs-vagrant-puppet`
+* `cd ~/code/dcos-vagrant-puppet`
 * run `vagrant up` to launch the Vagrant cluster
 * When complete, go to the master UI http://192.168.33.11
 * To destroy, run `vagrant destroy -f`
 
 ## Notes
 
+* Designed to run masterless
 * It's monolithic to make it real easy to understand the steps
-* It's not intended to be production grade or designed to be all you need for your deployment
 
 ## Limitations
 
-* Has only been designed to run on CentOS 7
-* No Heira integration
-* Designed to run masterless
+* Only been designed to run on CentOS 7
+* It's not intended to be production grade or designed to be all you need for your deployment
