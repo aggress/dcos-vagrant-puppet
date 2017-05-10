@@ -47,11 +47,13 @@ class base {
     ensure   => 'present',
   }
 
+  # dc/os does not like being out of time
   exec { 'enable systemd-timesyncd':
     command  => 'timedatectl set-ntp true',
   } ->
 
-   exec { 'set local-rtc to 0 for utc':
+  # ensures the hardware clock is aligned with the system
+  exec { 'set local-rtc to 0 for utc':
     command  => 'timedatectl set-local-rtc 0',
   }
 
@@ -83,26 +85,21 @@ class bootstrap_install {
     content  => $str,
   }
 
+  # you'll have already downloaded this file to where you launch vagrant from
   file { '/root/dcos_generate_config.sh':
     ensure   => 'link',
     target   => '/vagrant/dcos_generate_config.sh',
   }
 
+  # amend for your network choices
   file { '/root/genconf/config.yaml':
     ensure   => file,
     content  => file('/vagrant/config.yaml'),
   }
 
-  exec { 'curl dcos_generate_config from dcos.io':
-    command  => 'curl -fsSLO https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh',
-    cwd      => '/root',
-    unless   => 'test -f /root/dcos_generate_config.sh',
-  }
-
   exec { 'dcos_generate_config':
     command  => 'bash dcos_generate_config.sh',
     cwd      => '/root',
-    require  => File['/root/dcos_generate_config.sh'],
   }
 
   exec { 'launch bootstrap nginx container':

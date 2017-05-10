@@ -34,6 +34,11 @@ Vagrant.configure(2) do |config|
       config.vm.provider "virtualbox" do |v|
         v.customize ["modifyvm", :id, "--memory", opts[:mem]]
         v.customize ["modifyvm", :id, "--cpus", opts[:cpu]]
+        # suggested speedup for network performance through faster name resolution
+        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+        # suggested speedup by enabing multiple cpu cores, figured it would be by default
+        v.customize ["modifyvm", :id, "--ioapic", "on"]
       end
       config.vm.provision "ansible" do |ansible|
         ansible.playbook = "playbook.yml"
