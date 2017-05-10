@@ -1,6 +1,8 @@
 # Base class for all nodes
 class base {
 
+  $required_packages = [ 'unzip', 'tar', 'xz', 'curl', 'ipset', 'ntp' ]
+
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
   yumrepo { 'docker':
@@ -21,6 +23,10 @@ class base {
     require  => Exec['yum update'],
   }
 
+  package { $required_packages:
+    ensure   => 'installed',
+  }
+
   file { '/etc/modules-load.d/overlay.conf':
     content  => 'overlay',
   }
@@ -37,9 +43,16 @@ class base {
     command  => 'setenforce 0',
   }
 
-  service { 'ntpd':
-    ensure   => 'running',
-    enable   =>  true,
+  group { 'nogroup':
+    ensure   => 'present',
+  }
+
+  exec { 'enable systemd-timesyncd':
+    command  => 'timedatectl set-ntp true',
+  } ->
+
+   exec { 'set local-rtc to 0 for utc':
+    command  => 'timedatectl set-local-rtc 0',
   }
 
   service { 'docker':
@@ -80,9 +93,16 @@ class bootstrap_install {
     content  => file('/vagrant/config.yaml'),
   }
 
+  exec { 'curl dcos_generate_config from dcos.io':
+    command  => 'curl -fsSLO https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh',
+    cwd      => '/root',
+    unless   => 'test -f /root/dcos_generate_config.sh',
+  }
+
   exec { 'dcos_generate_config':
     command  => 'bash dcos_generate_config.sh',
     cwd      => '/root',
+    require  => File['/root/dcos_generate_config.sh'],
   }
 
   exec { 'launch bootstrap nginx container':
@@ -96,7 +116,7 @@ class master_install {
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
   exec { 'curl the installer file from the boostrap node':
-    command  => 'curl -o http://192.68.33.10:80/dcos_install.sh',
+    command  => 'curl -fsSLO http://192.168.33.10:80/dcos_install.sh',
     cwd      => '/root',
   }
 
@@ -112,7 +132,7 @@ class private_agent_install {
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
   exec { 'curl the installer file from the boostrap node':
-    command  => 'curl -o http://192.68.33.10:80/dcos_install.sh',
+    command  => 'curl -fsSLO http://192.168.33.10:80/dcos_install.sh',
     cwd      => '/root',
   }
 

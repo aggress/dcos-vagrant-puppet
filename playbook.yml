@@ -14,5 +14,29 @@
       yum: state=present name={{ item }}
       with_items:
         - puppet-agent
-        - ntp
+
+- hosts: bootstrap
+  become: true
+  tasks:
+    - name: execute puppet for bootstrap
+      command: /opt/puppetlabs/bin/puppet apply site.pp
+      args:
+        chdir: /vagrant
+
+- hosts: master
+  become: true
+  tasks:
+    - name: execute puppet for master
+      command: /opt/puppetlabs/bin/puppet apply site.pp
+      args:
+        chdir: /vagrant
+
+- hosts: private-agent
+  become: true
+  tasks:
+    - name: execute puppet for private-agent
+      command: /opt/puppetlabs/bin/puppet apply site.pp
+      args:
+        chdir: /vagrant      
+
 
