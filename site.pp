@@ -1,7 +1,7 @@
 # Base class for all nodes
 class base {
 
-  $required_packages = [ 'unzip', 'tar', 'xz', 'curl', 'ipset', 'ntp' ]
+  $required_packages = [ 'unzip', 'tar', 'xz', 'curl', 'ipset', 'ntp', 'nc' ]
 
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
@@ -90,9 +90,9 @@ class bootstrap_install {
   }
 
   # you'll have already downloaded this file to where you launch vagrant from
-  file { '/root/dcos_generate_config.sh':
+  file { '/root/dcos_generate_config.ee.sh':
     ensure   => 'link',
-    target   => '/vagrant/dcos_generate_config.sh',
+    target   => '/vagrant/dcos_generate_config.ee.sh',
   }
 
   # amend for your network choices
@@ -102,7 +102,7 @@ class bootstrap_install {
   }
 
   exec { 'dcos_generate_config':
-    command  => 'bash dcos_generate_config.sh',
+    command  => 'bash dcos_generate_config.ee.sh',
     cwd      => '/root',
   }
 
