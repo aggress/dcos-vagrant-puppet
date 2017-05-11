@@ -23,10 +23,11 @@ boxes = [
 ]
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "centos/7"
+  config.vm.box = "centos7_updated"
   boxes.each do |opts|
     config.vm.define opts[:name] do |config|
       config.vm.hostname = opts[:name]
+      config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
       config.vm.network :private_network, ip: opts[:eth1]
       config.vm.provider "virtualbox" do |v|
         v.customize ["modifyvm", :id, "--memory", opts[:mem]]
@@ -39,8 +40,10 @@ Vagrant.configure(2) do |config|
       end
     end
   end
-  config.vm.provision "puppet" do |puppet|
-    puppet.environment = "production"
-    puppet.environment_path  = "environments"
-  end
+    config.vm.provision :shell, :inline => <<-SCRIPT
+      yum -y -q install https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+      yum -y -q update
+      yum -y -q install puppet-agent
+      /opt/puppetlabs/bin/puppet apply /vagrant/site.pp
+    SCRIPT
 end
