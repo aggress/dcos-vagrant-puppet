@@ -20,7 +20,7 @@ https://docs.mesosphere.com/latest/installing/custom/advanced/
   * VirtualBox
 2. Clone this repository locally into a folder where you'll execute it from
 
-   `git clone git@gitub.com:aggress/dcos-vagrant-puppet ~/code/`
+   `git clone git@gitub.com:aggress/dcos-vagrant-puppet`
 
 3. Download the ~800MB DC/OS installation file to the project directory as you only want to get it once
 
@@ -45,6 +45,7 @@ to the enterprise file.
 ## Limitations
 
 * Only tested on CentOS 7
+* Only tested with DC/OS 1.9
 * IPs hard coded
 
 ## Workflow
