@@ -35,9 +35,15 @@ A simple, monolithic puppet manifest that installs DC/OS onto a Vagrant cluster
 * Designed to run masterless
 * It's monolithic to make it really easy to understand the steps
 * I used the shell provisioner to bootstrap Puppet on the guest VMs, as it was the simplest
-* Built for the open source DC/OS release, can be easily updated for the Enterprise version
+* Built for the open source DC/OS release, can be easily updated for the Enterprise version by
+downloading dcos_generate_config.ee.sh into the project folder, then amending site.pp to point
+to the enterprise file. 
 
 ## Limitations
 
 * Has been designed to run on CentOS 7
 * It's not intended to be production grade or designed to be all you need for your deployment
+
+## Workflow
+
+![workflow diagram](https://raw.githubusercontent.com/aggress/dcos-vagrant-puppet/master/dcos-advanced-install-workflow.png "Advanced installation workflow")
