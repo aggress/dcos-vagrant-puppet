@@ -2,7 +2,10 @@
 
 ## Overview
 
-A simple, monolithic puppet manifest that installs DC/OS onto a Vagrant cluster
+A simple, monolithic Puppet manifest that installs DC/OS onto a Vagrant cluster, using the
+Mesosphere DC/OS Advanced Installer
+
+https://docs.mesosphere.com/latest/installing/custom/advanced/
 
 * Creates a local Vagrant cluster of 3 nodes {bootstrap,master,private agent}
 * Runs masterless Puppet
@@ -33,16 +36,16 @@ A simple, monolithic puppet manifest that installs DC/OS onto a Vagrant cluster
 ## Notes
 
 * Designed to run masterless
-* It's monolithic to make it really easy to understand the steps
-* I used the shell provisioner to bootstrap Puppet on the guest VMs, as it was the simplest
+* Monolithic to make it really easy to understand the steps
+* Uses the shell provisioner to bootstrap Puppet on the guest VMs, as it was the simplest
 * Built for the open source DC/OS release, can be easily updated for the Enterprise version by
 downloading dcos_generate_config.ee.sh into the project folder, then amending site.pp to point
 to the enterprise file. 
 
 ## Limitations
 
-* Has been designed to run on CentOS 7
-* It's not intended to be production grade or designed to be all you need for your deployment
+* Only tested on CentOS 7
+* IPs hard coded
 
 ## Workflow
 
