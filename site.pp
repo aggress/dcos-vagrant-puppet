@@ -1,7 +1,7 @@
 # Base class for all nodes
 class base {
 
-  $required_packages = [ 'unzip', 'tar', 'xz', 'curl', 'ipset', 'ntp', 'nc' ]
+  $required_packages = [ 'unzip', 'tar', 'xz', 'curl', 'ipset', 'net-tools', 'ntp', 'nc' ]
 
   Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/', '/opt/puppetlabs/bin' ] }
 
